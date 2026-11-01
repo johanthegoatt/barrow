@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Barrow — how much mulch, soil or gravel to buy</title>
+  <meta name="description" content="Work out how much mulch, topsoil, compost, gravel or sand to order for a bed or a patch of ground: the volume, the weight, the bags or barrow-loads, and whether bags or a bulk load works out cheaper. Runs in your browser; nothing you type is uploaded.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23497a3a'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'%3E%3Cpath d='M8 12h13l-2 7H11z'/%3E%3Ccircle cx='13' cy='23' r='2.4' fill='%23fff'/%3E%3Cpath d='M19 19l4 4'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <h1><span class="logo" aria-hidden="true"></span> Barrow</h1>
+      <p class="tag">How much mulch, topsoil, compost, gravel or sand to buy for a bed or a patch of ground. Barrow works out the volume, what it'll weigh, the bags or barrow-loads to shift it, and whether bags or a bulk load comes out cheaper.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <form id="form" class="card" autocomplete="off">
+      <fieldset class="group">
+        <legend>The area</legend>
+        <div class="field-row">
+          <label class="field narrow">
+            <span>Shape</span>
+            <select id="shape">
+              <option value="rect">Rectangle</option>
+              <option value="strip">Border / strip</option>
+              <option value="circle">Circle</option>
+            </select>
+          </label>
+          <label class="field" id="f-length">
+            <span id="l-label">Length</span>
+            <input id="len" inputmode="decimal" placeholder="e.g. 4">
+          </label>
+          <label class="field" id="f-width">
+            <span id="w-label">Width</span>
+            <input id="wid" inputmode="decimal" placeholder="e.g. 2.5">
+          </label>
+          <label class="field" id="f-diameter" hidden>
+            <span>Diameter</span>
+            <input id="dia" inputmode="decimal" placeholder="e.g. 4">
+          </label>
+          <label class="field narrow">
+            <span>in</span>
+            <select id="area-unit">
+              <option value="m">metres</option>
+              <option value="cm">cm</option>
+              <option value="ft">feet</option>
+              <option value="yd">yards</option>
+            </select>
+          </label>
+        </div>
+        <p class="hint">Measure the ground you're covering. A border is just a long thin rectangle. For an odd shape, break it into rectangles and add them up.</p>
+      </fieldset>
+
+      <fieldset class="group">
+        <legend>The material &amp; depth</legend>
+        <div class="field-row">
+          <label class="field">
+            <span>Material</span>
+            <select id="material">
+              <option value="mulch">Mulch / wood chips</option>
+              <option value="bark">Bark / play bark</option>
+              <option value="compost">Compost / soil improver</option>
+              <option value="topsoil">Topsoil</option>
+              <option value="gravel">Gravel / aggregate</option>
+              <option value="sand">Sand</option>
+            </select>
+          </label>
+          <label class="field narrow">
+            <span>Depth</span>
+            <input id="depth" inputmode="decimal" placeholder="e.g. 5">
+          </label>
+          <label class="field narrow">
+            <span>in</span>
+            <select id="depth-unit">
+              <option value="cm">cm</option>
+              <option value="mm">mm</option>
+              <option value="in">inches</option>
+            </select>
+          </label>
+        </div>
+        <p class="hint" id="depth-hint">A 5–8 cm (2–3 in) layer suits most beds. Barrow nudges you if the depth looks thin or heavy for the material.</p>
+      </fieldset>
+
+      <fieldset class="group">
+        <legend>Prices &amp; sizes <span class="opt-tag">optional</span></legend>
+        <div class="field-row">
+          <label class="field narrow">
+            <span>Bag size (L)</span>
+            <input id="bag-size" inputmode="decimal" placeholder="50">
+          </label>
+          <label class="field narrow">
+            <span>Price a bag</span>
+            <input id="bag-price" inputmode="decimal" placeholder="e.g. 6">
+          </label>
+          <label class="field narrow">
+            <span>Bulk load (m³)</span>
+            <input id="bulk-size" inputmode="decimal" placeholder="0.7">
+          </label>
+          <label class="field narrow">
+            <span>Price a load</span>
+            <input id="bulk-price" inputmode="decimal" placeholder="e.g. 45">
+          </label>
+        </div>
+        <details class="more">
+          <summary>Fine-tune density &amp; barrow size</summary>
+          <div class="field-row">
+            <label class="field narrow">
+              <span>Density (t/m³)</span>
+              <input id="density" inputmode="decimal" placeholder="typical">
+            </label>
+            <label class="field narrow">
+              <span>Barrow (L)</span>
+              <input id="barrow" inputmode="decimal" placeholder="65">
+            </label>
+          </div>
+          <p class="hint">Leave these blank to use typical figures. Your supplier's own weight-per-cubic-metre is the one to trust.</p>
+        </details>
+      </fieldset>
+    </form>
+
+    <div class="out" id="out" aria-live="polite"></div>
+
+    <div class="actions">
+      <button id="share" class="ghost" type="button">Copy a link to this</button>
+      <span id="share-done" class="share-done" aria-live="polite"></span>
+    </div>
+
+    <section class="note">
+      <h2>Why it's really a volume job</h2>
+      <p>Mulch, soil and gravel are all sold a dozen different ways, by the litre, the bag, the cubic foot, the cubic
+      yard, the bulk bag, but underneath it's one sum: the area you're covering times how deep you want it. Barrow
+      works that out, then the parts people trip on. Loose material settles or compacts once it's spread, so you order
+      a little over the finished depth (gravel most, mulch not at all). It's priced by volume but delivered by weight,
+      so Barrow puts a weight on it, because a cubic metre of gravel is well over a tonne and won't go in the car.
+      And a stack of small bags is often dearer than one bulk load, so if you put in the prices it does that sum too.
+      Densities and bag sizes change from yard to yard, so these are planning figures: confirm the weight and the bag
+      size with your supplier before you order.</p>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <p>Everything runs in your browser. Nothing you type is uploaded. <a href="https://github.com/johanthegoatt/barrow">Source</a>.</p>
+  </footer>
+
+  <!-- Tip the wheelbarrow -->
+  <div id="tip-dock" class="tip-dock">
+    <button id="tip-hide" class="tip-hide" type="button" aria-label="Hide Tip">tuck away</button>
+    <div id="tip-bubble" class="tip-bubble" role="status" aria-live="polite"></div>
+    <button id="tip" class="tip" type="button" data-mood="calm" aria-label="Tip the wheelbarrow. Tap for a tip.">
+      <svg class="tip-svg" viewBox="0 0 72 64" aria-hidden="true">
+        <g class="tip-wheel"><circle cx="24" cy="52" r="7"/><circle class="tip-hub" cx="24" cy="52" r="2.4"/></g>
+        <path class="tip-leg" d="M50 44 L54 58" />
+        <path class="tip-handle" d="M50 26 L66 20" />
+        <path class="tip-tray" d="M12 24 H54 L48 44 H22 Z" />
+        <path class="tip-load" d="M14 24 Q22 15 33 17 Q44 13 52 24 Z" />
+        <g class="tip-face">
+          <circle class="tip-eye l" cx="26" cy="31" r="2.6"/>
+          <circle class="tip-eye r" cx="38" cy="31" r="2.6"/>
+          <path class="tip-mouth" d="M27 37 Q32 41 37 37" />
+        </g>
+      </svg>
+    </button>
+  </div>
+
+  <script src="src/core.js"></script>
+  <script src="src/tip.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>
