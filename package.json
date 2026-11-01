@@ -1,0 +1,10 @@
+{
+  "name": "barrow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "How much mulch, topsoil, compost, gravel or sand to buy for a bed or a patch of ground: the volume, the weight, the bags or barrow-loads, and whether bags or a bulk load works out cheaper. Runs in the browser, nothing uploaded. With Tip the wheelbarrow.",
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "MIT"
+}
