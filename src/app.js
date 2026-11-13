@@ -72,16 +72,13 @@
       (r.settle > 0 ? ", plus " + Math.round(r.settle * 100) + "% so it beds down to depth" : "") +
       " — " + volSub + " to buy.</p>";
 
-    var depthPill = r.depthFlag === "low"
+    var dc = B.depthCheck(el.material.value, r.depthCm) || { band: "good", message: "" };
+    var depthPill = dc.band === "thin"
       ? '<span class="tagpill warn">thin layer</span>'
-      : r.depthFlag === "high"
-        ? '<span class="tagpill warn">deep layer</span>'
+      : dc.band === "deep"
+        ? '<span class="tagpill warn">' + (dc.organic ? "too deep" : "deep layer") + '</span>'
         : '<span class="tagpill good">good depth</span>';
-    var depthNote = r.depthFlag === "low"
-      ? "At " + r.depthCm + " cm it's under the usual " + r.depthLo + "–" + r.depthHi + " cm; weeds get through a thin layer and it dries out."
-      : r.depthFlag === "high"
-        ? "At " + r.depthCm + " cm it's over the usual " + r.depthLo + "–" + r.depthHi + " cm; too deep can smother roots."
-        : "At " + r.depthCm + " cm it's within the usual " + r.depthLo + "–" + r.depthHi + " cm for this material.";
+    var depthNote = "At " + r.depthCm + " cm: " + dc.message;
 
     var priceBlock = "";
     if (r.compare) {
