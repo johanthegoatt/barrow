@@ -161,3 +161,31 @@ test("pack and unpack round-trip the state", function () {
   assert.deepStrictEqual(B.unpack(B.pack(state)), state);
   assert.strictEqual(B.unpack("not valid base64 @@@"), null);
 });
+
+test("deep organic mulch warns about smothering and mulch volcanoes", function () {
+  var r = B.depthCheck("mulch", 15);
+  assert.strictEqual(r.band, "deep");
+  assert.match(r.message, /mulch volcano/i);
+  assert.match(r.message, /off stems and trunks|clear of stems/i);
+});
+
+test("a normal mulch depth reads as good", function () {
+  var r = B.depthCheck("mulch", 7);
+  assert.strictEqual(r.band, "good");
+});
+
+test("thin mulch warns about weeds coming through", function () {
+  var r = B.depthCheck("mulch", 2);
+  assert.strictEqual(r.band, "thin");
+  assert.match(r.message, /thin/i);
+});
+
+test("deep gravel does not get the mulch-volcano warning", function () {
+  var r = B.depthCheck("gravel", 20);
+  assert.strictEqual(r.band, "deep");
+  assert.ok(!/mulch volcano/i.test(r.message));
+});
+
+test("no depth gives no check", function () {
+  assert.strictEqual(B.depthCheck("mulch", 0), null);
+});

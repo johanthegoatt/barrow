@@ -236,6 +236,39 @@
 
   // The whole input packs into the URL fragment, which the browser never sends
   // to a server, so a shared link reopens on the same job with nothing uploaded.
+  // Check a finished depth against what the material wants, and for the loose
+  // surface mulches add the horticultural safety rule: no more than about 8 cm
+  // (3 in), kept clear of stems and trunks. Piling organic mulch into a cone
+  // against the bark (a "mulch volcano") holds damp against the trunk and
+  // suffocates the roots, which is one of the commonest ways a young tree is
+  // slowly killed. Guidance from University of Maryland, Illinois and UGA
+  // extension services. Returns a band (thin / good / deep) and a plain message.
+  function depthCheck(material, depthCm) {
+    var mat = MATERIALS[material] || MATERIALS.mulch;
+    var d = num(depthCm);
+    if (!(d > 0)) return null;
+    var organic = material === "mulch" || material === "bark" || material === "compost";
+    var band = "good";
+    if (d < mat.depthLo) band = "thin";
+    else if (d > mat.depthHi) band = "deep";
+
+    var message;
+    if (band === "thin") {
+      message = "A little thin. " + mat.label + " is usually laid " + mat.depthLo + "–" + mat.depthHi +
+        " cm; much less and weeds come through or it doesn't hold moisture.";
+    } else if (band === "deep" && organic) {
+      message = "Deeper than mulch wants. Keep organic mulch to about 8 cm (3 in): deeper can smother the roots. " +
+        "Spread it out to the drip line and keep a hand's width clear of stems and trunks — a cone of mulch against the bark rots it (a “mulch volcano”).";
+    } else if (band === "deep") {
+      message = "Deeper than the usual " + mat.depthLo + "–" + mat.depthHi + " cm. Fine if the bed needs it, but you'll use a lot more material.";
+    } else if (organic) {
+      message = "Good depth. Spread it to the drip line rather than piling it up, and keep it off stems and trunks.";
+    } else {
+      message = "Good depth for " + mat.label.toLowerCase() + ".";
+    }
+    return { band: band, organic: organic, lo: mat.depthLo, hi: mat.depthHi, message: message };
+  }
+
   function pack(state) {
     var json = JSON.stringify(state);
     var b64 = typeof btoa === "function" ? btoa(unescape(encodeURIComponent(json))) : Buffer.from(json, "utf8").toString("base64");
@@ -256,6 +289,6 @@
     IN: IN, FT: FT, YD: YD, CUFT: CUFT, CUYD: CUYD, MATERIALS: MATERIALS,
     toM: toM, toM3: toM3, round1: round1, round2: round2,
     areaM2: areaM2, estimate: estimate, comparePrice: comparePrice, advise: advise,
-    pack: pack, unpack: unpack
+    depthCheck: depthCheck, pack: pack, unpack: unpack
   };
 });
