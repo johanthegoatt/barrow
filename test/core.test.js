@@ -46,6 +46,25 @@ test("circle area uses the diameter", function () {
   assert.strictEqual(r.area, 12.57);     // pi * 2^2
 });
 
+test("ring area is the outer circle less the clear middle", function () {
+  var r = B.estimate({
+    shape: "ring",
+    diameter: { value: 4, unit: "m" },
+    innerDiameter: { value: 2, unit: "m" },
+    depth: { value: 5, unit: "cm" }, material: "mulch"
+  });
+  assert.strictEqual(r.area, 9.42);      // pi * (2^2 - 1^2) = 3pi
+});
+
+test("a ring with no clear middle is just the full circle", function () {
+  var r = B.estimate({
+    shape: "ring",
+    diameter: { value: 4, unit: "m" },
+    depth: { value: 5, unit: "cm" }, material: "mulch"
+  });
+  assert.strictEqual(r.area, 12.57);     // falls back to pi * 2^2
+});
+
 // Imperial: feet and inches in, cubic feet out, 2 cu ft bags.
 test("imperial bed gives cubic feet and 2 cu ft bags", function () {
   var r = B.estimate({

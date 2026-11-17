@@ -79,13 +79,23 @@
   // Area of the patch in square metres.
   //   shape "rect" / "strip": length x width
   //   shape "circle":         pi r^2 from the diameter
+  //   shape "ring":           a circle with a clear gap in the middle, for
+  //                           mulching round a tree. The trunk is kept clear,
+  //                           so the covered ground is the outer circle minus
+  //                           the clear inner circle (pi (R^2 - r^2)).
   function areaM2(opts) {
     var shape = opts.shape || "rect";
-    if (shape === "circle") {
+    if (shape === "circle" || shape === "ring") {
       var d = toM(opts.diameter && opts.diameter.value, opts.diameter && opts.diameter.unit);
       if (!(d > 0)) return NaN;
-      var r = d / 2;
-      return Math.PI * r * r;
+      var R = d / 2;
+      var inner = 0;
+      if (shape === "ring") {
+        var di = toM(opts.innerDiameter && opts.innerDiameter.value, opts.innerDiameter && opts.innerDiameter.unit);
+        // A gap that's missing or wider than the bed falls back to a full circle.
+        if (di > 0 && di < d) inner = di / 2;
+      }
+      return Math.PI * (R * R - inner * inner);
     }
     var l = toM(opts.length && opts.length.value, opts.length && opts.length.unit);
     var w = toM(opts.width && opts.width.value, opts.width && opts.width.unit);
@@ -212,6 +222,10 @@
     } else if (r.depthFlag === "high") {
       tips.push("At " + r.depthCm + " cm this is deeper than the usual " + r.depthLo + "–" + r.depthHi +
         " cm; piling mulch too deep can smother roots, so check that's what you want.");
+    }
+
+    if (r.shape === "ring") {
+      tips.push("This is the ring round the tree, with the middle left clear. Keep mulch back a hand's width from the trunk and don't pile it up the bark; a mound against the trunk rots it.");
     }
 
     tips.push("That's about " + r.bags + " bag" + (r.bags === 1 ? "" : "s") + " (at " + r.bagM3 +
