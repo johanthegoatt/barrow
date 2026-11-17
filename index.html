@@ -27,6 +27,7 @@
               <option value="rect">Rectangle</option>
               <option value="strip">Border / strip</option>
               <option value="circle">Circle</option>
+              <option value="ring">Ring / round a tree</option>
             </select>
           </label>
           <label class="field" id="f-length">
@@ -38,8 +39,12 @@
             <input id="wid" inputmode="decimal" placeholder="e.g. 2.5">
           </label>
           <label class="field" id="f-diameter" hidden>
-            <span>Diameter</span>
+            <span id="dia-label">Diameter</span>
             <input id="dia" inputmode="decimal" placeholder="e.g. 4">
+          </label>
+          <label class="field" id="f-inner" hidden>
+            <span>Clear middle</span>
+            <input id="inner" inputmode="decimal" placeholder="e.g. 0.3">
           </label>
           <label class="field narrow">
             <span>in</span>

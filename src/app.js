@@ -6,7 +6,7 @@
   var B = window.Barrow;
   var $ = function (id) { return document.getElementById(id); };
 
-  var ids = ["shape", "len", "wid", "dia", "area-unit", "material", "depth", "depth-unit",
+  var ids = ["shape", "len", "wid", "dia", "inner", "area-unit", "material", "depth", "depth-unit",
     "bag-size", "bag-price", "bulk-size", "bulk-price", "density", "barrow"];
   var el = {};
   ids.forEach(function (id) { el[id] = $(id); });
@@ -15,7 +15,7 @@
   function readState() {
     return {
       sh: el.shape.value,
-      l: el.len.value.trim(), w: el.wid.value.trim(), d: el.dia.value.trim(), au: el["area-unit"].value,
+      l: el.len.value.trim(), w: el.wid.value.trim(), d: el.dia.value.trim(), i: el.inner.value.trim(), au: el["area-unit"].value,
       m: el.material.value, dp: el.depth.value.trim(), du: el["depth-unit"].value,
       bs: el["bag-size"].value.trim(), bp: el["bag-price"].value.trim(),
       ks: el["bulk-size"].value.trim(), kp: el["bulk-price"].value.trim(),
@@ -29,6 +29,7 @@
     if (s.l != null) el.len.value = s.l;
     if (s.w != null) el.wid.value = s.w;
     if (s.d != null) el.dia.value = s.d;
+    if (s.i != null) el.inner.value = s.i;
     if (s.au) el["area-unit"].value = s.au;
     if (s.m) el.material.value = s.m;
     if (s.dp != null) el.depth.value = s.dp;
@@ -121,7 +122,7 @@
     var s = readState();
     var opts = {
       shape: s.sh,
-      length: { value: s.l, unit: s.au }, width: { value: s.w, unit: s.au }, diameter: { value: s.d, unit: s.au },
+      length: { value: s.l, unit: s.au }, width: { value: s.w, unit: s.au }, diameter: { value: s.d, unit: s.au }, innerDiameter: { value: s.i, unit: s.au },
       depth: { value: s.dp, unit: s.du },
       material: s.m,
       density: s.dn === "" ? undefined : s.dn,
@@ -155,10 +156,13 @@
 
   // Show only the fields the shape needs.
   function onShape() {
-    var round = el.shape.value === "circle";
+    var sh = el.shape.value;
+    var round = sh === "circle" || sh === "ring";
     $("f-length").hidden = round;
     $("f-width").hidden = round;
     $("f-diameter").hidden = !round;
+    $("f-inner").hidden = sh !== "ring";
+    $("dia-label").textContent = sh === "ring" ? "Outer width" : "Diameter";
     $("l-label").textContent = el.shape.value === "strip" ? "Length of run" : "Length";
     $("w-label").textContent = el.shape.value === "strip" ? "Width of bed" : "Width";
   }
@@ -173,7 +177,7 @@
   }
 
   // Hints follow where the eye is.
-  ["shape", "len", "wid", "dia", "area-unit"].forEach(function (id) {
+  ["shape", "len", "wid", "dia", "inner", "area-unit"].forEach(function (id) {
     el[id].addEventListener("focus", function () { if (window.Tip) window.Tip.context("area"); });
   });
   ["material", "depth", "depth-unit"].forEach(function (id) {
