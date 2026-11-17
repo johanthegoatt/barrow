@@ -44,6 +44,7 @@ body {
 
 .field-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-top: 10px; }
 .field { display: flex; flex-direction: column; gap: 5px; flex: 1 1 120px; }
+.field[hidden] { display: none; }
 .field.narrow { flex: 0 1 130px; }
 .field span { font-size: 13px; color: var(--soft); font-weight: 600; }
 .field input, .field select {
