@@ -171,6 +171,7 @@
       depthFlag: depthFlag
     };
 
+    out.vehicle = opts.vehicle ? vehicleCheck(out.weightKg, opts.vehicle, opts.payloadKg) : null;
     out.compare = comparePrice(opts, out, bagM3);
     out.advice = advise(out);
     return out;
@@ -203,6 +204,35 @@
     };
   }
 
+  // Typical usable payloads, in kg, to turn the order weight into trips. These
+  // are deliberately conservative: a car's real limit is on its VIN plate (max
+  // laden weight minus the kerb weight minus the people in it), and a soft boot
+  // floor and tired springs mean less again is sensible. Loose aggregate is
+  // dense, so a single builder's bag can be close to a small car's whole
+  // payload, which is how cars get dangerously overloaded. Figures are a guide;
+  // always check the plate. An unbraked trailer is capped by its own GVW.
+  var VEHICLES = {
+    "car":       { label: "Car",                 payloadKg: 400 },
+    "estate":    { label: "Estate / large car",  payloadKg: 500 },
+    "small-van": { label: "Small van",           payloadKg: 800 },
+    "large-van": { label: "Large van (LWB)",     payloadKg: 1200 },
+    "trailer":   { label: "Trailer (unbraked)",  payloadKg: 500 }
+  };
+
+  // How many trips a vehicle takes to carry the order weight, and whether even
+  // one load is over its payload (so it should be delivered). Returns null when
+  // no vehicle is chosen or the weight isn't known.
+  function vehicleCheck(weightKg, vehicleKey, payloadOverride) {
+    var v = VEHICLES[vehicleKey];
+    if (!v) return null;
+    var w = num(weightKg);
+    if (!(w > 0)) return null;
+    var payload = num(payloadOverride);
+    if (!(payload > 0)) payload = v.payloadKg;
+    var trips = Math.ceil(w / payload - 1e-6);
+    return { key: vehicleKey, label: v.label, payloadKg: payload, trips: trips, overOne: w > payload };
+  }
+
   function advise(r) {
     var tips = [];
     var vol = r.system === "imperial" ? (r.cuft + " cu ft (" + r.cuyd + " cu yd)") : (r.volume + " m³ (" + r.litres + " litres)");
@@ -215,6 +245,17 @@
     }
     tips.push("It'll weigh roughly " + r.weightT + " tonne" + (r.weightT === 1 ? "" : "s") + " (" + r.weightKg +
       " kg). " + (r.weightT >= 0.5 ? "That's a delivery or several car trips, not one boot-load." : "Light enough for a few bags in the car."));
+
+    if (r.vehicle) {
+      var v = r.vehicle;
+      if (v.overOne) {
+        tips.push("A " + v.label.toLowerCase() + " carries about " + v.payloadKg + " kg a trip, so this " + r.weightKg +
+          " kg is " + v.trips + " trip" + (v.trips === 1 ? "" : "s") + " — and even one load is over the payload, so getting it delivered is safer than overloading. Check your vehicle's own plate: the usual limit is a few hundred kg once you count yourself.");
+      } else {
+        tips.push("A " + v.label.toLowerCase() + " carries about " + v.payloadKg + " kg a trip, so this " + r.weightKg +
+          " kg fits in " + v.trips + " trip" + (v.trips === 1 ? "" : "s") + ". Check your vehicle's plate before you load: the real limit is its max weight minus the kerb weight minus the people in it.");
+      }
+    }
 
     if (r.depthFlag === "low") {
       tips.push("At " + r.depthCm + " cm this is thinner than the usual " + r.depthLo + "–" + r.depthHi +
@@ -300,9 +341,9 @@
   }
 
   return {
-    IN: IN, FT: FT, YD: YD, CUFT: CUFT, CUYD: CUYD, MATERIALS: MATERIALS,
+    IN: IN, FT: FT, YD: YD, CUFT: CUFT, CUYD: CUYD, MATERIALS: MATERIALS, VEHICLES: VEHICLES,
     toM: toM, toM3: toM3, round1: round1, round2: round2,
     areaM2: areaM2, estimate: estimate, comparePrice: comparePrice, advise: advise,
-    depthCheck: depthCheck, pack: pack, unpack: unpack
+    depthCheck: depthCheck, vehicleCheck: vehicleCheck, pack: pack, unpack: unpack
   };
 });
