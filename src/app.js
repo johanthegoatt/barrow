@@ -7,7 +7,7 @@
   var $ = function (id) { return document.getElementById(id); };
 
   var ids = ["shape", "len", "wid", "dia", "inner", "area-unit", "material", "depth", "depth-unit",
-    "bag-size", "bag-price", "bulk-size", "bulk-price", "density", "barrow"];
+    "bag-size", "bag-price", "bulk-size", "bulk-price", "density", "barrow", "vehicle"];
   var el = {};
   ids.forEach(function (id) { el[id] = $(id); });
   var out = $("out");
@@ -19,7 +19,8 @@
       m: el.material.value, dp: el.depth.value.trim(), du: el["depth-unit"].value,
       bs: el["bag-size"].value.trim(), bp: el["bag-price"].value.trim(),
       ks: el["bulk-size"].value.trim(), kp: el["bulk-price"].value.trim(),
-      dn: el.density.value.trim(), br: el.barrow.value.trim()
+      dn: el.density.value.trim(), br: el.barrow.value.trim(),
+      vh: el.vehicle.value
     };
   }
 
@@ -40,6 +41,7 @@
     if (s.kp != null) el["bulk-price"].value = s.kp;
     if (s.dn != null) el.density.value = s.dn;
     if (s.br != null) el.barrow.value = s.br;
+    if (s.vh != null) el.vehicle.value = s.vh;
   }
 
   function cell(k, v, u, big) {
@@ -131,6 +133,7 @@
       bulkSize: s.ks === "" ? undefined : { value: s.ks, unit: "m3" },
       bulkPrice: s.kp,
       barrow: s.br === "" ? undefined : { value: s.br, unit: "L" },
+      vehicle: s.vh || undefined,
       system: s.au === "ft" || s.au === "yd" ? "imperial" : "metric"
     };
     var r = B.estimate(opts);
