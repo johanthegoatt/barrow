@@ -208,3 +208,39 @@ test("deep gravel does not get the mulch-volcano warning", function () {
 test("no depth gives no check", function () {
   assert.strictEqual(B.depthCheck("mulch", 0), null);
 });
+
+test("vehicleCheck turns weight into trips for a vehicle", () => {
+  // 900 kg in a car with a 400 kg payload = 3 trips, and one load is over.
+  const v = B.vehicleCheck(900, "car");
+  assert.strictEqual(v.payloadKg, 400);
+  assert.strictEqual(v.trips, 3);
+  assert.strictEqual(v.overOne, true);
+  // The same 900 kg in a large van fits in one trip.
+  const van = B.vehicleCheck(900, "large-van");
+  assert.strictEqual(van.trips, 1);
+  assert.strictEqual(van.overOne, false);
+});
+
+test("vehicleCheck takes a payload override and rejects bad input", () => {
+  const v = B.vehicleCheck(600, "car", 300);
+  assert.strictEqual(v.payloadKg, 300);
+  assert.strictEqual(v.trips, 2);
+  assert.strictEqual(B.vehicleCheck(600, "spaceship"), null);
+  assert.strictEqual(B.vehicleCheck(0, "car"), null);
+});
+
+test("estimate carries a vehicle check and advises on it", () => {
+  // A deep gravel bed is heavy; a car load will be over the payload.
+  const r = B.estimate({
+    shape: "rect", length: { value: 4, unit: "m" }, width: { value: 3, unit: "m" },
+    depth: { value: 5, unit: "cm" }, material: "gravel", vehicle: "car"
+  });
+  assert.ok(r.ok && r.vehicle);
+  assert.strictEqual(r.vehicle.key, "car");
+  assert.ok(r.advice.some((t) => /a trip/.test(t)));
+});
+
+test("estimate leaves the vehicle check off when none is chosen", () => {
+  const r = B.estimate({ shape: "rect", length: { value: 2, unit: "m" }, width: { value: 2, unit: "m" }, depth: { value: 5, unit: "cm" }, material: "mulch" });
+  assert.strictEqual(r.vehicle, null);
+});
